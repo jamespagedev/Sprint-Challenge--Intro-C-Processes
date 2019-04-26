@@ -4,8 +4,9 @@
 #include <string.h>   // `strcpy()`, `strcat()`, and `strcmp()`
 #include <sys/stat.h> // `stat()`
 
-void print_dir_details(char *dir)
+void print_dir_details(char *dir, int dir_level)
 {
+  printf("Directory = \"%s\"\n", dir);
   // Open directory
   DIR *dir_details = opendir(dir);
   struct dirent *dir_item;
@@ -27,14 +28,34 @@ void print_dir_details(char *dir)
     stat(dir_with_item, &item_stat);
     if (S_ISREG(item_stat.st_mode)) // item is file
     {
-      printf("\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+      if (dir_level == 1)
+      {
+        printf("\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+      }
+      else
+      {
+        printf("\t\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+      }
     }
     else if (S_ISDIR(item_stat.st_mode)) // item is dir
     {
       // no need to re-print current dir twice
       if (strcmp(item_name, ".") != 0)
       {
-        printf("\t<directory>\t%s\n", item_name);
+        if (dir_level == 1)
+        {
+          printf("\t<directory>\t%s\n", item_name);
+        }
+        else
+        {
+          printf("\t\t<directory>\t%s\n", item_name);
+        }
+      }
+      //prints out weird, can't figure this "stretch" recursion out
+      if (dir_level == 1)
+      {
+        printf("\n");
+        print_dir_details(item_name, 2); // 2 is for child directory
       }
     }
   }
@@ -52,12 +73,12 @@ int main(int argc, char **argv)
   // Note: argc is at least 1 for the current file name typed from user.
   // Parse command line
   char *dir;
+  int dir_level = 1;
 
   // Check Directory is Valid
   if (argc - 1 > 0) // dir was given
   {
     dir = argv[1];
-    printf("Directory = \"%s\"\n", dir);
     DIR *check_dir = opendir(dir);
     if (ENOENT == errno)
     {
@@ -69,7 +90,6 @@ int main(int argc, char **argv)
   else // no dir given
   {
     dir = ".";
-    printf("Directory = \"%s\"\n", dir);
     DIR *check_dir = opendir(dir);
     if (ENOENT == errno)
     {
@@ -80,7 +100,7 @@ int main(int argc, char **argv)
   }
 
   // Repeatly read and print entries
-  print_dir_details(dir);
+  print_dir_details(dir, dir_level);
 
   return 0;
 }
