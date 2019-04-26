@@ -1,6 +1,47 @@
 #include <stdio.h>
-#include <dirent.h>
-#include <errno.h>
+#include <dirent.h>   // `DIR`, `struct dirent`, `opendir()`, `readdir()`, and `closedir()`
+#include <errno.h>    // ENOENT and errno
+#include <string.h>   // `strcpy()`, `strcat()`, and `strcmp()`
+#include <sys/stat.h> // `stat()`
+
+void print_dir_details(char *dir)
+{
+  // Open directory
+  DIR *dir_details = opendir(dir);
+  struct dirent *dir_item;
+
+  // Print items in directories
+  while ((dir_item = readdir(dir_details)) != NULL)
+  {
+    // deconstruct item name for more readable code
+    char *item_name = dir_item->d_name;
+
+    // required dir\filename for stat()
+    char dir_with_item[strlen(dir) + strlen(item_name) + 1];
+    strcpy(dir_with_item, dir);
+    strcat(dir_with_item, "\\");
+    strcat(dir_with_item, item_name);
+
+    // setup item info
+    struct stat item_stat;
+    stat(dir_with_item, &item_stat);
+    if (S_ISREG(item_stat.st_mode)) // item is file
+    {
+      printf("\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+    }
+    else if (S_ISDIR(item_stat.st_mode)) // item is dir
+    {
+      // no need to re-print current dir twice
+      if (strcmp(item_name, ".") != 0)
+      {
+        printf("\t<directory>\t%s\n", item_name);
+      }
+    }
+  }
+
+  // Close directory
+  closedir(dir_details);
+}
 
 /**
  * Main
@@ -16,7 +57,7 @@ int main(int argc, char **argv)
   if (argc - 1 > 0) // dir was given
   {
     dir = argv[1];
-    printf("Directory = %s\n", dir);
+    printf("Directory = \"%s\"\n", dir);
     DIR *check_dir = opendir(dir);
     if (ENOENT == errno)
     {
@@ -28,7 +69,7 @@ int main(int argc, char **argv)
   else // no dir given
   {
     dir = ".";
-    printf("Directory = %s\n", dir);
+    printf("Directory = \"%s\"\n", dir);
     DIR *check_dir = opendir(dir);
     if (ENOENT == errno)
     {
@@ -38,11 +79,8 @@ int main(int argc, char **argv)
     closedir(check_dir);
   }
 
-  // Open directory
-
   // Repeatly read and print entries
-
-  // Close directory
+  print_dir_details(dir);
 
   return 0;
 }
