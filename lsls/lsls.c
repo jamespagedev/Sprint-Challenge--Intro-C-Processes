@@ -57,6 +57,12 @@ void print_dirs(char *dir, int dir_level)
     struct stat item_stat;
     stat(dir_with_item, &item_stat);
     print_dir_details(item_stat, item_name, dir_level);
+    //prints out weird, can't figure this "stretch" recursion out
+    // if (dir_level == 1)
+    // {
+    //   printf("\n");
+    //   print_dirs(item_name, 2); // 2 is for child directory
+    // }
   }
 
   // Close directory
