@@ -6,7 +6,6 @@
 
 void print_dir_details(char *dir, int dir_level)
 {
-  printf("Directory = \"%s\"\n", dir);
   // Open directory
   DIR *dir_details = opendir(dir);
   struct dirent *dir_item;
@@ -30,11 +29,11 @@ void print_dir_details(char *dir, int dir_level)
     {
       if (dir_level == 1)
       {
-        printf("\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+        printf("\t%ld\t\t%s\n", item_stat.st_size, item_name);
       }
       else
       {
-        printf("\t\t%10lld\t%s\n", (long long int)item_stat.st_size, item_name);
+        printf("\t\t%ld\t\t%s\n", item_stat.st_size, item_name);
       }
     }
     else if (S_ISDIR(item_stat.st_mode)) // item is dir
