@@ -48,7 +48,7 @@ void print_dirs(char *orig_dir, char *curr_dir, int dir_level)
     char *item_name = dir_item->d_name;
 
     // required dir\filename for stat()
-    char dir_with_item[strlen(orig_dir) + strlen(item_name) + 1];
+    char dir_with_item[strlen(orig_dir) + strlen(item_name)];
     strcpy(dir_with_item, orig_dir);
     strcat(dir_with_item, "\\");
     strcat(dir_with_item, item_name);
@@ -58,18 +58,18 @@ void print_dirs(char *orig_dir, char *curr_dir, int dir_level)
     stat(dir_with_item, &item_stat);
     print_dir_details(item_stat, item_name, dir_level);
     // prints out weird, can't figure this "stretch" recursion out
-    if (dir_level == 1)
-    {
-      printf("\n");
-      if (S_ISREG(item_stat.st_mode))
-      {
-        print_dirs(orig_dir, item_name, 2); // 2 is for child directory
-      }
-      else if (S_ISDIR(item_stat.st_mode)) // item is dir
-      {
-        print_dirs(orig_dir, dir_with_item, 2); // 2 is for child directory
-      }
-    }
+    // if (dir_level == 1)
+    // {
+    //   printf("\n");
+    //   if (S_ISREG(item_stat.st_mode))
+    //   {
+    //     print_dirs(orig_dir, item_name, 2); // 2 is for child directory
+    //   }
+    //   else if (S_ISDIR(item_stat.st_mode)) // item is dir
+    //   {
+    //     print_dirs(orig_dir, dir_with_item, 2); // 2 is for child directory
+    //   }
+    // }
   }
 
   // Close directory
